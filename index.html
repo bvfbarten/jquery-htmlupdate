@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+    <head>
+         <meta charset="UTF-8"/> 
+        <title>jquery.htmlUpdate test</title>
+        <script src="./js/jquery-3.3.1.js"></script>
+        <script src="./dist/jquery.update.js"></script>
+    </head>
+    <body>
+
+    <div class="itemToBeWidgetized">processing</div>
+    <div class="itemToBeWidgetized2">processing</div>
+    <div class="itemToBeWidgetized">processing</div>
+
+    <style>
+    .clicked {
+        color:red;
+    }
+    </style>
+    <script type="text/html" id="template2">
+        <div>{{ hello }} {{ name }}</div>
+    </script>
+    <script type="text/html" id="template">
+        <div>{{ hello }} {{ name }}</div>
+        <button class="clickable" onclick="itemToBeWidgetized.changeCounter(1)" ondblclick="itemToBeWidgetized.changeCounter(-3)" >Clicked {{ counter }} times!</button>
+        <input type="text" class="newHello" onkeyup="itemToBeWidgetized.changeAttribute('hello', this.value)" value="{{ hello }}" name="newHello">
+        <input type="text" class="newName" onkeyup="itemToBeWidgetized.changeAttribute('name', this.value)" value="{{ name }}" name="newName">
+        <br>
+        {{#addId}}
+        {{#test}}
+            <a class="colorize {{ classes }}" onclick="itemToBeWidgetized.addClicked({{ _id }})" href="#">
+                Click Here: {{ test }}: {{ _id }}  : {{ name }}
+            </a>
+            <br>
+        {{/test}}
+        {{/addId}}
+    </script>
+    <script>
+        $('.itemToBeWidgetized2').update('Hello World');
+var itemToBeWidgetized = $.classed({
+    _id: '.itemToBeWidgetized',
+    _template: $('#template').html(),
+    changeCounter: function(amount) {
+        this._data.counter += amount;
+        this._render();
+    },
+    addClicked: function(_id){
+        var e = this._data.test[_id];
+        if(e.classes.search('clicked') > -1){
+            e.classes = e.classes.replace('clicked', '');
+        } else {
+            e.classes += " clicked";
+        }
+        this._render();
+    },
+    changeAttribute: function(key, value){
+        this._data[key] = value;
+        this._render();
+    },
+    _data: {
+        addId: function(){
+            var self = this;
+            $.each(self.test, function(i, e){
+                e._id = i;
+            });
+            return function(text, render){
+                return render(text);
+            };
+        },
+        name: 'world',
+        hello: 'hello',
+        counter: 0,
+        test: [
+            {
+                test:'hi',
+                classes: 'none',
+            },
+            {
+                test:'hello',
+                classes: '',
+            },
+        ]
+    }
+});
+        $('.itemToBeWidgetized2').update($('#template2').html(), {
+            hello: 'world',
+            name: 'Earth'
+        });
+    </script>
+</body>
+</html>
